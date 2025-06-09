@@ -9,8 +9,9 @@ app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
 
   try {
-    const response = await axios.post(
-      "https://general-runtime.voiceflow.com/state/user_mentes_millonarias/interact",
+    // Enviar mensaje a Voiceflow
+    const vfResponse = await axios.post(
+      "https://general-runtime.voiceflow.com/state/mentes_millonarias/interact",
       {
         action: {
           type: "text",
@@ -29,7 +30,13 @@ app.post("/", async (req, res) => {
       }
     );
 
-    res.status(200).send({ success: true, voiceflowResponse: response.data });
+    // Enviar datos a Zapier Webhook
+    await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
+      horario_1,
+      horario_2
+    });
+
+    res.status(200).send({ success: true, voiceflowResponse: vfResponse.data });
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).send({ success: false, error: err.message });
