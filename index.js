@@ -8,7 +8,13 @@ app.use(bodyParser.json());
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
 
+  // 👇 Aquí puedes reemplazar por variables reales si las tienes
+  const nombre = "Juan Pérez";
+  const telefono = "1234567890";
+  const interes = "salir de deudas";
+
   try {
+    // 🟢 Enviar mensaje a Voiceflow
     const response = await axios.post(
       "https://general-runtime.voiceflow.com/state/user_1234/interact",
       {
@@ -23,11 +29,18 @@ app.post("/", async (req, res) => {
       },
       {
         headers: {
-          Authorization: "Bearer VF.DM.684504adfc69bc02b8a8ce9a.SJ7WlRIGLHsJwny9",
+          Authorization: "Bearer VF.1234abcd5678efgh", // 🔁 Reemplaza con tu Agent Key
           "Content-Type": "application/json"
         }
       }
     );
+
+    // 🟡 Enviar información a Zapier Webhook
+    await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
+      interes,
+      nombre,
+      telefono
+    });
 
     res.status(200).send({ success: true, voiceflowResponse: response.data });
   } catch (err) {
