@@ -7,14 +7,14 @@ app.use(bodyParser.json());
 
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
-  const userID = "mentes_millonarias_2526"; // ID fijo para Voiceflow
+  const userID = "mentes_millonarias_2526";
+  const versionID = "68424b62ec8e90877c24b894"; // Tu versionID real
 
   try {
     const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
 
-    // Nueva API de Voiceflow con versionID y user
     const vfResponse = await axios.post(
-      "https://general-runtime.voiceflow.com/v2/interact",
+      `https://general-runtime.voiceflow.com/state/${versionID}/user/${userID}/interact`,
       {
         action: {
           type: "text",
@@ -23,11 +23,7 @@ app.post("/", async (req, res) => {
         config: {
           tts: false,
           stt: false
-        },
-        user: {
-          userID: userID
-        },
-        versionID: "68424b62ec8e90877c24b894"
+        }
       },
       {
         headers: {
@@ -37,13 +33,11 @@ app.post("/", async (req, res) => {
       }
     );
 
-    // (Opcional) reenviar a Zapier para monitoreo
     await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
       horario_1,
       horario_2
     });
 
-    // Respuesta al frontend o Zapier
     res.status(200).send({
       success: true,
       horario_1,
