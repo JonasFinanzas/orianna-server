@@ -9,13 +9,16 @@ app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
 
   try {
+    // Mensaje más natural, las frases ya vienen formateadas desde Zapier
+    const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
+
     // Enviar mensaje a Voiceflow
     const vfResponse = await axios.post(
       "https://general-runtime.voiceflow.com/state/mentes_millonarias/interact",
       {
         action: {
           type: "text",
-          payload: `Tengo horarios disponibles a las ${horario_1} y a las ${horario_2}. ¿Cuál prefieres?`
+          payload: mensaje
         },
         config: {
           tts: false,
@@ -30,13 +33,20 @@ app.post("/", async (req, res) => {
       }
     );
 
-    // Enviar datos a Zapier Webhook
+    // (Opcional) enviar a Zapier webhook si quieres seguir usándolo
     await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
       horario_1,
       horario_2
     });
 
-    res.status(200).send({ success: true, voiceflowResponse: vfResponse.data });
+    // Responder a Voiceflow
+    res.status(200).send({
+      success: true,
+      horario_1,
+      horario_2,
+      voiceflowResponse: vfResponse.data
+    });
+
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).send({ success: false, error: err.message });
