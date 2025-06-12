@@ -7,14 +7,14 @@ app.use(bodyParser.json());
 
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
+  const userID = "mentes_millonarias_2526"; // ID fijo para esta integración
 
   try {
-    // Mensaje más natural, las frases ya vienen formateadas desde Zapier
     const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
 
-    // Enviar mensaje a Voiceflow
+    // Enviar mensaje a Voiceflow (v2 API)
     const vfResponse = await axios.post(
-      "https://general-runtime.voiceflow.com/state/mentes_millonarias/interact",
+      "https://general-runtime.voiceflow.com/v2/dialogue",
       {
         action: {
           type: "text",
@@ -23,7 +23,8 @@ app.post("/", async (req, res) => {
         config: {
           tts: false,
           stt: false
-        }
+        },
+        userID: userID
       },
       {
         headers: {
@@ -33,13 +34,13 @@ app.post("/", async (req, res) => {
       }
     );
 
-    // (Opcional) enviar a Zapier webhook si quieres seguir usándolo
+    // (Opcional) Enviar también a Zapier para trazabilidad
     await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
       horario_1,
       horario_2
     });
 
-    // Responder a Voiceflow
+    // Enviar respuesta final
     res.status(200).send({
       success: true,
       horario_1,
@@ -48,7 +49,7 @@ app.post("/", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err.response?.data || err.message);
+    console.error("Error al enviar a Voiceflow:", err.response?.data || err.message);
     res.status(500).send({ success: false, error: err.message });
   }
 });
@@ -60,3 +61,4 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT || 3000, () => {
   console.log("Servidor escuchando en el puerto 3000");
 });
+
