@@ -11,10 +11,19 @@ app.post("/", async (req, res) => {
 
   try {
     const response = await axios.post(
-      "https://api.voiceflow.com/v2/agent/68424b62ec8e90877c24b893/interact", // ← Asegúrate que este sea tu verdadero agentID
+      "https://api.voiceflow.com/v2/agent/68424b62ec8e90877c24b893/interact",
       {
-        user_id: "mentes_millonarias_2526", // puedes hacerlo dinámico si quieres
-        query: mensaje
+        user_id: "mentes_millonarias_2526",
+        messages: [
+          {
+            type: "text",
+            payload: mensaje
+          }
+        ],
+        config: {
+          tts: false,
+          stt: false
+        }
       },
       {
         headers: {
