@@ -8,27 +8,34 @@ app.use(bodyParser.json());
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
 
-  // Mensaje que se enviará a Voiceflow
+  // Crear el mensaje para Voiceflow
   const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
 
+  // Preparar body a enviar a Voiceflow
+  const bodyToSend = {
+    user_id: "mentes_millonarias_2526",
+    start: true,
+    messages: [
+      {
+        type: "text",
+        payload: mensaje
+      }
+    ],
+    config: {
+      tts: false,
+      stt: false
+    }
+  };
+
+  // Log para depurar
+  console.log("===> Body que se enviará a Voiceflow:");
+  console.log(JSON.stringify(bodyToSend, null, 2));
+
   try {
-    // Llamada a Voiceflow (API v2 con Agent)
+    // Enviar a Voiceflow
     const response = await axios.post(
       "https://api.voiceflow.com/v2/agent/68424b62ec8e90877c24b893/interact",
-      {
-        user_id: "mentes_millonarias_2526",
-        start: true,  // Inicia nueva sesión
-        messages: [
-          {
-            type: "text",
-            payload: mensaje
-          }
-        ],
-        config: {
-          tts: false,
-          stt: false
-        }
-      },
+      bodyToSend,
       {
         headers: {
           Authorization: "Bearer VF.DM.684504adfc69bc02b8a8ce9a.SJ7WlRIGLHsJwny9",
@@ -37,13 +44,13 @@ app.post("/", async (req, res) => {
       }
     );
 
-    // (Opcional) Reenvío a Zapier
+    // Enviar también a Zapier (opcional)
     await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
       horario_1,
       horario_2
     });
 
-    // Enviar respuesta
+    // Responder exitosamente
     res.status(200).send({
       success: true,
       horario_1,
@@ -57,7 +64,7 @@ app.post("/", async (req, res) => {
   }
 });
 
-// Endpoint de prueba
+// Prueba rápida desde navegador
 app.get("/", (req, res) => {
   res.send("¡Servidor Orianna en línea y escuchando!");
 });
