@@ -7,23 +7,14 @@ app.use(bodyParser.json());
 
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
-  const userID = "mentes_millonarias_2526";
-  const versionID = "68424b62ec8e90877c24b894"; // Tu versionID real
+  const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
 
   try {
-    const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
-
-    const vfResponse = await axios.post(
-      `https://general-runtime.voiceflow.com/state/${versionID}/user/${userID}/interact`,
+    const response = await axios.post(
+      "https://api.voiceflow.com/v2/agent/68424b62ec8e90877c24b893/interact", // ← Asegúrate que este sea tu verdadero agentID
       {
-        action: {
-          type: "text",
-          payload: mensaje
-        },
-        config: {
-          tts: false,
-          stt: false
-        }
+        user_id: "mentes_millonarias_2526", // puedes hacerlo dinámico si quieres
+        query: mensaje
       },
       {
         headers: {
@@ -33,6 +24,7 @@ app.post("/", async (req, res) => {
       }
     );
 
+    // Enviar también a Zapier (opcional)
     await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
       horario_1,
       horario_2
@@ -42,7 +34,7 @@ app.post("/", async (req, res) => {
       success: true,
       horario_1,
       horario_2,
-      voiceflowResponse: vfResponse.data
+      voiceflowResponse: response.data
     });
 
   } catch (err) {
