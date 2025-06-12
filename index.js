@@ -7,13 +7,17 @@ app.use(bodyParser.json());
 
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
+
+  // Mensaje que se enviará a Voiceflow
   const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
 
   try {
+    // Llamada a Voiceflow (API v2 con Agent)
     const response = await axios.post(
       "https://api.voiceflow.com/v2/agent/68424b62ec8e90877c24b893/interact",
       {
         user_id: "mentes_millonarias_2526",
+        start: true,  // Inicia nueva sesión
         messages: [
           {
             type: "text",
@@ -33,12 +37,13 @@ app.post("/", async (req, res) => {
       }
     );
 
-    // Enviar también a Zapier (opcional)
+    // (Opcional) Reenvío a Zapier
     await axios.post("https://hooks.zapier.com/hooks/catch/23193821/uyu0juh/", {
       horario_1,
       horario_2
     });
 
+    // Enviar respuesta
     res.status(200).send({
       success: true,
       horario_1,
@@ -52,10 +57,12 @@ app.post("/", async (req, res) => {
   }
 });
 
+// Endpoint de prueba
 app.get("/", (req, res) => {
   res.send("¡Servidor Orianna en línea y escuchando!");
 });
 
+// Iniciar servidor
 app.listen(process.env.PORT || 3000, () => {
   console.log("Servidor escuchando en el puerto 3000");
 });
