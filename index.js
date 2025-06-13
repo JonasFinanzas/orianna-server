@@ -10,17 +10,26 @@ app.post("/", async (req, res) => {
 
   const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
 
+  const body = {
+    user_id: "mentes_millonarias_2526",
+    config: {
+      tts: false,
+      stt: false
+    },
+    messages: [
+      {
+        type: "text",
+        payload: mensaje
+      }
+    ]
+  };
+
   console.log("Enviando mensaje a Voiceflow:", mensaje);
 
   try {
     const vfResponse = await axios.post(
       "https://general-runtime.voiceflow.com/state/user/mentes_millonarias_2526/interact",
-      {
-        request: {
-          type: "text",
-          payload: mensaje
-        }
-      },
+      body,
       {
         headers: {
           Authorization: "Bearer VF.DM.684504adfc69bc02b8a8ce9a.SJ7WlRIGLHsJwny9",
@@ -29,15 +38,11 @@ app.post("/", async (req, res) => {
       }
     );
 
-    res.status(200).send({ success: true, voiceflowResponse: vfResponse.data });
+    res.status(200).send({ success: true, voiceflow: vfResponse.data });
   } catch (err) {
     console.error("Error al enviar a Voiceflow:", err.response?.data || err.message);
     res.status(500).send({ success: false, error: err.message });
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("¡Servidor Orianna en línea y escuchando!");
 });
 
 app.listen(process.env.PORT || 3000, () => {
