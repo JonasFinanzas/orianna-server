@@ -8,21 +8,17 @@ app.use(bodyParser.json());
 app.post("/", async (req, res) => {
   const { horario_1, horario_2 } = req.body;
 
+  const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
+
+  console.log("Enviando mensaje a Voiceflow:", mensaje);
+
   try {
-    const mensaje = `Tengo horarios disponibles ${horario_1} y ${horario_2}. ¿Cuál prefieres?`;
-
-    console.log("Enviando mensaje a Voiceflow:", mensaje);
-
     const vfResponse = await axios.post(
       "https://general-runtime.voiceflow.com/state/user/mentes_millonarias_2526/interact",
       {
         request: {
           type: "text",
           payload: mensaje
-        },
-        config: {
-          tts: false,
-          stt: false
         }
       },
       {
