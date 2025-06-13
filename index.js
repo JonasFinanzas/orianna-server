@@ -24,7 +24,7 @@ app.post('/', async (req, res) => {
       },
       {
         headers: {
-          Authorization: 'Bearer VF.DM.684504adfc69bc02b8a8ce9a.SJ7WlRIGLHsJwny9',
+          Authorization: 'Bearer VF.DM.684504adfc69bc02b8a8ce9a.wVuD8xkHqbq9jrTr',
           'Content-Type': 'application/json',
         },
       }
